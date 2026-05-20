@@ -1,0 +1,42 @@
+# ============================================================
+# render.yaml — Render Deployment Configuration
+# ============================================================
+#
+# This file tells Render exactly HOW to deploy your backend.
+# Place this file in your ROOT folder: ResumeAnalyser/render.yaml
+#
+# Render reads this file when you connect your GitHub repo.
+# It sets up the build commands, start command, and environment.
+# ============================================================
+
+services:
+  - type: web
+    name: resume-analyzer-backend
+    # This name will become part of your URL:
+    # https://resume-analyzer-backend.onrender.com
+
+    runtime: python
+    rootDir: backend
+    # Tells Render: look inside the 'backend' folder for the app
+
+    buildCommand: |
+      pip install -r requirements.txt
+      python -m spacy download en_core_web_sm
+    # Runs during deployment to install packages + spaCy model
+
+    startCommand: gunicorn app:app
+    # Runs your Flask app using gunicorn (production server)
+    # app:app means: file 'app.py', Flask object 'app'
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: FLASK_ENV
+        value: production
+    # Environment variables available inside your Flask app
+    # Access them with: os.environ.get('FLASK_ENV')
+
+    plan: free
+    # Render's free tier — perfect for portfolio projects
+    # Note: free tier spins down after 15 min of inactivity
+    # First request after spindown takes ~30 seconds to respond

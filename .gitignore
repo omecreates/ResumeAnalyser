@@ -1,0 +1,53 @@
+# ============================================================
+# .gitignore — Files Git Should NEVER Track
+# ============================================================
+#
+# Place this file in your ROOT folder: ResumeAnalyser/.gitignore
+#
+# WHY THIS MATTERS:
+# Some files/folders should NEVER be uploaded to GitHub:
+# - venv/ = thousands of files, recreatable with pip install
+# - node_modules/ = thousands of files, recreatable with npm install
+# - .env = contains secrets (API keys, passwords)
+# - uploads/ = user-uploaded files (privacy + size)
+# - __pycache__/ = Python bytecode cache, not source code
+# - dist/ = built frontend (Vercel builds this itself)
+#
+# Git reads this file and automatically skips these paths.
+# ============================================================
+
+# ---- Python ----
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/uploads/*
+!backend/uploads/.gitkeep
+# The !.gitkeep means: ignore all uploads EXCEPT this one
+# empty placeholder file (so Git tracks the folder exists)
+
+# ---- Node / React ----
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+
+# ---- Environment Files ----
+# Keep .env.production (it has no secrets, just a URL)
+# but never commit files with real API keys or passwords
+backend/.env
+frontend/.env
+# Uncomment above if your .env files ever contain secrets
+
+# ---- OS Files ----
+.DS_Store          # Mac folder metadata
+Thumbs.db          # Windows thumbnail cache
+desktop.ini        # Windows folder settings
+
+# ---- VS Code ----
+.vscode/settings.json
+# (you CAN commit .vscode/extensions.json if you want
+#  to recommend extensions to teammates)
+
+# ---- Logs ----
+*.log
+npm-debug.log*
