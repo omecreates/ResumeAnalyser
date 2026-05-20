@@ -2,7 +2,6 @@ import os
 import re
 import json
 import nltk
-import spacy
 import pdfplumber
 
 from flask import Flask, request, jsonify
@@ -14,12 +13,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 nltk.download('punkt', quiet=True)
 nltk.download('stopwords', quiet=True)
 nltk.download('punkt_tab', quiet=True)
-
-try:
-    nlp = spacy.load("en_core_web_sm")
-except OSError:
-    print("⚠️ spaCy model not found. Run: python -m spacy download en_core_web_sm")
-    nlp = None
 
 app = Flask(__name__)
 CORS(app)
