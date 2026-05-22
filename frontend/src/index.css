@@ -4,7 +4,6 @@
   --bg-primary: #0a0a0f;
   --bg-secondary: #111118;
   --bg-card: #16161f;
-  --bg-card-hover: #1c1c28;
   --accent: #7c6af7;
   --accent-light: #a89ef5;
   --accent-glow: rgba(124, 106, 247, 0.15);
@@ -20,18 +19,10 @@
   --font-mono: 'DM Mono', monospace;
   --radius: 16px;
   --radius-sm: 8px;
-  --shadow: 0 4px 32px rgba(0,0,0,0.4);
-  --shadow-accent: 0 0 40px rgba(124, 106, 247, 0.12);
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-
 body {
   font-family: var(--font-display);
   background-color: var(--bg-primary);
@@ -40,7 +31,6 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
-
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-primary); }
 ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }

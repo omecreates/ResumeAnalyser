@@ -1,0 +1,159 @@
+/* ── AICoach.css — Place at: frontend/src/components/AICoach.css ── */
+
+.aicoach {
+  display: flex; flex-direction: column; gap: 16px;
+  animation: fadeUp 0.5s ease both;
+}
+
+.aicoach-header {
+  background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 16px; padding: 24px;
+}
+.aicoach-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em;
+  color: #a5b4fc; text-transform: uppercase; margin-bottom: 10px;
+}
+.ai-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: #10b981;
+  box-shadow: 0 0 8px #10b98199; animation: pulse 2s infinite;
+}
+.aicoach-title { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
+.aicoach-role { font-size: 0.85rem; color: var(--text-secondary); }
+.aicoach-role strong { color: #a5b4fc; }
+
+.aic-assessment {
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px; padding: 18px;
+}
+.aic-assessment p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.75; }
+
+.aic-projection {
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  background: rgba(16,185,129,0.04); border: 1px solid rgba(16,185,129,0.15);
+  border-radius: 12px; padding: 18px 24px;
+}
+.proj-item { display: flex; flex-direction: column; gap: 3px; }
+.proj-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.proj-val { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.04em; }
+.proj-arrow { font-size: 1.5rem; color: var(--text-muted); }
+.proj-gain {
+  margin-left: auto; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25);
+  color: #10b981; padding: 6px 14px; border-radius: 999px;
+  font-size: 0.82rem; font-weight: 700; white-space: nowrap;
+}
+
+/* ── Collapsible Section ── */
+.aic-section {
+  background: rgba(22,22,32,0.6); border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 14px; overflow: hidden;
+}
+.aic-section-hdr {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; background: none; border: none; cursor: pointer;
+  text-align: left; transition: background 0.2s;
+}
+.aic-section-hdr:hover { background: rgba(255,255,255,0.02); }
+.aic-section-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.92rem; color: var(--text-primary); }
+.aic-chevron { color: var(--text-muted); font-size: 1.1rem; transition: transform 0.25s; }
+.aic-section-body { padding: 0 20px 20px; }
+
+.aic-sub-note { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.6; }
+
+/* ── Lists ── */
+.aic-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.aic-list li {
+  font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65;
+  padding: 10px 14px; border-radius: 8px; position: relative; padding-left: 28px;
+}
+.aic-list li::before { position: absolute; left: 10px; top: 10px; font-size: 0.75rem; }
+.aic-list-green li { background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.12); }
+.aic-list-green li::before { content: "✓"; color: #10b981; }
+.aic-list-red li { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.12); }
+.aic-list-red li::before { content: "✗"; color: #ef4444; }
+.aic-list-purple li { background: rgba(99,102,241,0.04); border: 1px solid rgba(99,102,241,0.1); }
+.aic-list-purple li::before { content: "→"; color: #818cf8; }
+
+/* ── Priority Actions ── */
+.aic-actions { display: flex; flex-direction: column; gap: 12px; }
+.aic-action-card {
+  background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.12);
+  border-radius: 10px; padding: 14px 16px;
+}
+.aic-action-top { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.aic-action-num {
+  width: 24px; height: 24px; border-radius: 6px; background: rgba(239,68,68,0.15);
+  color: #f87171; font-size: 0.75rem; font-weight: 800; display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
+}
+.aic-action-title { flex: 1; font-size: 0.9rem; font-weight: 700; color: var(--text-primary); line-height: 1.4; }
+.aic-action-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.aic-action-desc { font-size: 0.83rem; color: var(--text-secondary); line-height: 1.65; padding-left: 34px; }
+
+/* ── Bullet Cards ── */
+.aic-bullet-card {
+  background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px;
+}
+.aic-bullet-before, .aic-bullet-after { padding: 10px 12px; border-radius: 8px; position: relative; }
+.aic-bullet-before { background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.15); }
+.aic-bullet-after { background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); }
+.aic-bullet-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 5px; }
+.aic-label-before { color: #f87171; }
+.aic-label-after { color: #10b981; }
+.aic-bullet-text { font-size: 0.87rem; line-height: 1.6; }
+.aic-text-before { color: var(--text-muted); }
+.aic-text-after { color: var(--text-primary); padding-right: 60px; }
+.aic-bullet-arrow { text-align: center; color: var(--text-muted); font-size: 1.1rem; }
+.aic-bullet-why { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; padding: 8px 10px; background: rgba(245,158,11,0.04); border-radius: 6px; }
+
+.aic-copy-btn {
+  position: absolute; right: 10px; top: 28px;
+  background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25);
+  color: #10b981; padding: 3px 10px; border-radius: 6px;
+  font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+}
+.aic-copy-btn:hover { background: rgba(16,185,129,0.2); }
+
+/* ── Missing Skills ── */
+.aic-missing-skills { display: flex; flex-wrap: wrap; gap: 8px; }
+.aic-missing-chip {
+  padding: 6px 13px; border-radius: 8px; font-size: 0.8rem; font-family: var(--font-mono); font-weight: 500;
+  background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); color: #fbbf24;
+  transition: transform 0.15s;
+}
+.aic-missing-chip:hover { transform: scale(1.05); }
+
+/* ── Section Feedback ── */
+.aic-section-feedback { display: flex; flex-direction: column; gap: 12px; }
+.aic-sf-row { background: rgba(6,182,212,0.04); border: 1px solid rgba(6,182,212,0.12); border-radius: 10px; padding: 12px 14px; }
+.aic-sf-name { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #67e8f9; display: block; margin-bottom: 5px; }
+.aic-sf-text { font-size: 0.87rem; color: var(--text-secondary); line-height: 1.65; }
+
+/* ── Score Justification ── */
+.aic-justify { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.75; padding: 14px; background: rgba(6,182,212,0.04); border-radius: 10px; border: 1px solid rgba(6,182,212,0.12); }
+
+/* ── Rewriter Tool ── */
+.aic-textarea {
+  width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 12px 14px; color: var(--text-primary);
+  font-family: var(--font-display); font-size: 0.88rem; resize: vertical;
+  transition: border-color 0.2s; margin-bottom: 10px;
+}
+.aic-textarea:focus { outline: none; border-color: rgba(99,102,241,0.4); }
+.aic-rewrite-btn {
+  background: linear-gradient(135deg, #f59e0b, #f97316); border: none;
+  color: white; padding: 11px 22px; border-radius: 9px; cursor: pointer;
+  font-family: var(--font-display); font-size: 0.88rem; font-weight: 700;
+  transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+}
+.aic-rewrite-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+.aic-rewrite-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.aic-rewrite-result { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+/* ── Footer ── */
+.aic-footer {
+  text-align: center; font-size: 0.73rem; color: var(--text-muted);
+  font-family: var(--font-mono); padding-top: 8px;
+}
