@@ -1,171 +1,194 @@
 # ============================================================
-# app.py — Flask Backend (AI-Upgraded Version)
+# app.py — Flask Backend (FINAL FIXED AI VERSION)
 # ============================================================
 
 import os
 import re
-import json
 import nltk
-import spacy
 import pdfplumber
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 
-# Import our new AI analyzer module
+# AI functions
 from ai_analyzer import analyze_with_ai, rewrite_bullet_point
 
-# Load .env file (reads GROQ_API_KEY into environment)
+# ============================================================
+# LOAD ENV VARIABLES
+# ============================================================
+
 load_dotenv()
 
-# ── NLTK Downloads ──
+# ============================================================
+# NLTK SETUP
+# ============================================================
+
 nltk.download('punkt', quiet=True)
 nltk.download('stopwords', quiet=True)
-nltk.download('punkt_tab', quiet=True)
 
-# ── spaCy Model ──
-try:
-    nlp = spacy.load("en_core_web_sm")
-except OSError:
-    print("⚠️  Run: python -m spacy download en_core_web_sm")
-    nlp = None
+# ============================================================
+# FLASK APP
+# ============================================================
 
-# ── Flask App ──
 app = Flask(__name__)
 CORS(app)
 
-# ── File Upload Config ──
+# ============================================================
+# FILE CONFIG
+# ============================================================
+
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf'}
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# ── Skills Database ──
+# ============================================================
+# SKILLS DATABASE
+# ============================================================
+
 SKILLS_DB = [
     "python", "java", "javascript", "typescript", "c++", "c#", "ruby", "go",
     "swift", "kotlin", "php", "scala", "rust", "matlab", "r",
     "html", "css", "react", "angular", "vue", "node.js", "express", "django",
-    "flask", "fastapi", "bootstrap", "tailwind", "next.js", "nuxt",
-    "machine learning", "deep learning", "neural networks", "nlp",
-    "natural language processing", "computer vision", "data science",
-    "pandas", "numpy", "scikit-learn", "tensorflow", "pytorch", "keras",
-    "matplotlib", "seaborn", "jupyter",
-    "sql", "mysql", "postgresql", "mongodb", "redis", "sqlite",
-    "oracle", "cassandra", "firebase",
-    "aws", "azure", "gcp", "google cloud", "docker", "kubernetes",
-    "jenkins", "git", "github", "gitlab", "ci/cd", "linux", "bash",
-    "rest api", "graphql", "microservices", "agile", "scrum",
-    "object oriented programming", "data structures", "algorithms",
-    "system design", "excel", "tableau", "power bi"
+    "flask", "fastapi", "bootstrap", "tailwind", "next.js",
+    "machine learning", "deep learning", "nlp",
+    "data science", "pandas", "numpy", "scikit-learn",
+    "tensorflow", "pytorch", "keras",
+    "sql", "mysql", "postgresql", "mongodb",
+    "aws", "azure", "docker", "kubernetes",
+    "git", "github", "linux",
+    "rest api", "graphql",
+    "data structures", "algorithms",
+    "excel", "tableau", "power bi"
 ]
 
-# ── Helpers ──
+# ============================================================
+# HELPERS
+# ============================================================
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
 def extract_text_from_pdf(filepath):
+
     text = ""
+
     with pdfplumber.open(filepath) as pdf:
+
         for page in pdf.pages:
+
             page_text = page.extract_text()
+
             if page_text:
                 text += page_text + "\n"
+
     return text.strip()
 
+
 def detect_skills(text):
+
     text_lower = text.lower()
-    return [skill for skill in SKILLS_DB if skill.lower() in text_lower]
+
+    return [
+        skill for skill in SKILLS_DB
+        if skill.lower() in text_lower
+    ]
+
 
 def extract_contact_info(text):
+
     email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
     phone_pattern = r'(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
+
     emails = re.findall(email_pattern, text)
     phones = re.findall(phone_pattern, text)
+
     return {
         'email': emails[0] if emails else None,
         'phone': phones[0] if phones else None
     }
 
+
 def calculate_ats_score(text, skills_found):
+
     score = 0
     breakdown = {}
 
+    # CONTENT SCORE
     word_count = len(text.split())
-    if word_count >= 400: content_score = 20
-    elif word_count >= 200: content_score = 12
-    elif word_count >= 100: content_score = 6
-    else: content_score = 2
-    breakdown['content_length'] = {'score': content_score, 'max': 20, 'word_count': word_count}
+
+    if word_count >= 400:
+        content_score = 20
+    elif word_count >= 200:
+        content_score = 12
+    else:
+        content_score = 5
+
+    breakdown['content_length'] = {
+        'score': content_score,
+        'max': 20,
+        'word_count': word_count
+    }
+
     score += content_score
 
+    # SKILLS SCORE
     skills_count = len(skills_found)
-    if skills_count >= 15: skills_score = 40
-    elif skills_count >= 10: skills_score = 30
-    elif skills_count >= 5: skills_score = 20
-    elif skills_count >= 2: skills_score = 10
-    else: skills_score = 0
-    breakdown['skills_match'] = {'score': skills_score, 'max': 40, 'skills_found': skills_count}
-    score += skills_score
 
-    text_lower = text.lower()
-    sections = {
-        'education': ['education', 'academic', 'qualification', 'degree', 'university', 'college'],
-        'experience': ['experience', 'work history', 'employment', 'internship', 'intern'],
-        'skills': ['skills', 'technical skills', 'competencies', 'technologies'],
-        'projects': ['projects', 'portfolio', 'work samples'],
-        'contact': ['email', 'phone', 'linkedin', 'github', 'contact']
+    if skills_count >= 15:
+        skills_score = 40
+    elif skills_count >= 10:
+        skills_score = 30
+    elif skills_count >= 5:
+        skills_score = 20
+    else:
+        skills_score = 10
+
+    breakdown['skills_match'] = {
+        'score': skills_score,
+        'max': 40,
+        'skills_found': skills_count
     }
-    found_sections = []
-    for section_name, keywords in sections.items():
-        for keyword in keywords:
-            if keyword in text_lower:
-                found_sections.append(section_name)
-                break
-    section_score = min(25, len(found_sections) * 5)
-    breakdown['sections'] = {'score': section_score, 'max': 25, 'found': found_sections}
-    score += section_score
 
-    action_verbs = ['developed', 'built', 'created', 'designed', 'implemented',
-                    'managed', 'led', 'improved', 'achieved', 'delivered',
-                    'optimized', 'analyzed', 'collaborated', 'mentored']
-    verb_count = sum(1 for verb in action_verbs if verb in text_lower)
-    has_numbers = bool(re.search(r'\d+%|\d+ years|\d+\+', text))
-    format_score = min(10, verb_count * 2)
-    if has_numbers: format_score += 5
-    format_score = min(15, format_score)
-    breakdown['formatting'] = {'score': format_score, 'max': 15, 'action_verbs_found': verb_count, 'has_quantified_results': has_numbers}
-    score += format_score
+    score += skills_score
 
     return min(100, score), breakdown
 
-def generate_recommendations(breakdown, skills_found, text):
-    recs = []
-    if breakdown['content_length']['word_count'] < 400:
-        recs.append("📝 Add more detail to your experience and project descriptions. Aim for 400+ words.")
-    if breakdown['skills_match']['skills_found'] < 10:
-        recs.append("🔧 Add more technical skills relevant to your target role.")
-    if 'education' not in breakdown['sections']['found']:
-        recs.append("🎓 Add an Education section with your degree, institution, and graduation year.")
-    if 'experience' not in breakdown['sections']['found']:
-        recs.append("💼 Add a Work Experience or Internships section.")
-    if 'contact' not in breakdown['sections']['found']:
-        recs.append("📧 Make sure your email, phone number, and LinkedIn/GitHub are clearly listed.")
-    if not breakdown['formatting']['has_quantified_results']:
-        recs.append("📊 Add numbers to your achievements (e.g., 'Improved performance by 30%').")
-    if breakdown['formatting']['action_verbs_found'] < 3:
-        recs.append("⚡ Start bullet points with strong action verbs like: Developed, Built, Designed, Led.")
-    if not recs:
-        recs.append("✅ Great resume! Consider tailoring skills to specific job descriptions.")
-    return recs
+
+def generate_recommendations(skills_found):
+
+    recommendations = []
+
+    if len(skills_found) < 5:
+        recommendations.append(
+            "Add more technical skills related to your target role."
+        )
+
+    recommendations.append(
+        "Use strong action verbs and measurable achievements."
+    )
+
+    recommendations.append(
+        "Tailor your resume for each job description."
+    )
+
+    return recommendations
 
 # ============================================================
-# ROUTE 1: Health Check
+# ROUTE 1 — HEALTH CHECK
 # ============================================================
+
 @app.route('/health', methods=['GET'])
 def health_check():
+
     groq_key_set = bool(os.environ.get("GROQ_API_KEY"))
+
     return jsonify({
         'status': 'ok',
         'message': 'Resume Analyzer API is running! 🚀',
@@ -174,114 +197,168 @@ def health_check():
     })
 
 # ============================================================
-# ROUTE 2: Analyze Resume (Main Route — now with AI)
+# ROUTE 2 — ANALYZE RESUME
 # ============================================================
+
 @app.route('/analyze', methods=['POST'])
 def analyze_resume():
-    # ── Validate file ──
-    if 'resume' not in request.files:
-        return jsonify({'error': 'No file uploaded.'}), 400
-    file = request.files['resume']
-    if file.filename == '':
-        return jsonify({'error': 'No file selected.'}), 400
-    if not allowed_file(file.filename):
-        return jsonify({'error': 'Only PDF files are allowed.'}), 400
 
-    # ── Get optional parameters from frontend ──
-    # The frontend can now send a target job role for personalized AI advice
-    job_role = request.form.get('job_role', '')
-    # ai_enabled lets the frontend choose whether to call AI
-    # Default True — can be set to False for quick test runs
-    ai_enabled = request.form.get('ai_enabled', 'true').lower() == 'true'
-
-    # ── Save file ──
-    filename = secure_filename(file.filename)
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(filepath)
-
-    # ── Extract text ──
     try:
+
+        # FILE VALIDATION
+        if 'resume' not in request.files:
+            return jsonify({'error': 'No file uploaded.'}), 400
+
+        file = request.files['resume']
+
+        if file.filename == '':
+            return jsonify({'error': 'No file selected.'}), 400
+
+        if not allowed_file(file.filename):
+            return jsonify({'error': 'Only PDF files allowed.'}), 400
+
+        # SAVE FILE
+        filename = secure_filename(file.filename)
+
+        filepath = os.path.join(
+            app.config['UPLOAD_FOLDER'],
+            filename
+        )
+
+        file.save(filepath)
+
+        # EXTRACT TEXT
         resume_text = extract_text_from_pdf(filepath)
+
+        if len(resume_text.strip()) < 50:
+            return jsonify({
+                'error': 'Could not extract enough text from PDF.'
+            }), 400
+
+        # ANALYSIS
+        skills_found = detect_skills(resume_text)
+
+        ats_score, breakdown = calculate_ats_score(
+            resume_text,
+            skills_found
+        )
+
+        contact_info = extract_contact_info(resume_text)
+
+        recommendations = generate_recommendations(skills_found)
+
+        # AI ANALYSIS
+        ai_analysis = None
+        ai_error = None
+
+        if os.environ.get("GROQ_API_KEY"):
+
+            try:
+
+                ai_analysis = analyze_with_ai(
+                    resume_text,
+                    skills_found,
+                    ats_score
+                )
+
+            except Exception as ai_exception:
+
+                ai_error = str(ai_exception)
+
+        # CLEANUP
+        try:
+            os.remove(filepath)
+        except:
+            pass
+
+        # RESPONSE
+        return jsonify({
+            'success': True,
+            'ats_score': ats_score,
+            'skills_found': skills_found,
+            'skills_count': len(skills_found),
+            'contact_info': contact_info,
+            'recommendations': recommendations,
+            'score_breakdown': breakdown,
+            'word_count': len(resume_text.split()),
+            'ai_analysis': ai_analysis,
+            'ai_error': ai_error
+        })
+
     except Exception as e:
-        return jsonify({'error': f'Could not read PDF: {str(e)}'}), 500
 
-    if not resume_text or len(resume_text.strip()) < 50:
-        return jsonify({'error': 'Could not extract text. Use a text-based PDF, not a scanned image.'}), 400
+        print("ANALYZE ERROR:", str(e))
 
-    # ── Traditional scoring (fast, always runs) ──
-    skills_found = detect_skills(resume_text)
-    ats_score, score_breakdown = calculate_ats_score(resume_text, skills_found)
-    contact_info = extract_contact_info(resume_text)
-    recommendations = generate_recommendations(score_breakdown, skills_found, resume_text)
-
-    # ── AI Analysis (Groq — runs if enabled and API key exists) ──
-    ai_analysis = None
-    ai_error = None
-
-    if ai_enabled and os.environ.get("GROQ_API_KEY"):
-        ai_result = analyze_with_ai(resume_text, skills_found, ats_score, job_role)
-        if "error" in ai_result and len(ai_result) == 1:
-            ai_error = ai_result["error"]
-        else:
-            ai_analysis = ai_result
-    elif not os.environ.get("GROQ_API_KEY"):
-        ai_error = "GROQ_API_KEY not configured on server."
-
-    # ── Cleanup uploaded file ──
-    try:
-        os.remove(filepath)
-    except:
-        pass
-
-    # ── Build and return combined response ──
-    return jsonify({
-        # Traditional analysis (always present)
-        'success': True,
-        'ats_score': ats_score,
-        'skills_found': skills_found,
-        'skills_count': len(skills_found),
-        'contact_info': contact_info,
-        'score_breakdown': score_breakdown,
-        'recommendations': recommendations,
-        'word_count': len(resume_text.split()),
-        'text_preview': resume_text[:500],
-
-        # AI analysis (present if Groq call succeeded)
-        'ai_analysis': ai_analysis,
-        'ai_error': ai_error,
-        'ai_enabled': ai_enabled and bool(os.environ.get("GROQ_API_KEY")),
-        'job_role': job_role,
-    })
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 # ============================================================
-# ROUTE 3: Rewrite a single bullet point (NEW)
+# ROUTE 3 — AI BULLET REWRITER
 # ============================================================
+
 @app.route('/rewrite', methods=['POST'])
 def rewrite_bullet():
-    """
-    Accepts a single bullet point and returns an AI-improved version.
-    Frontend sends: { "text": "worked on projects", "context": "backend developer" }
-    """
-    data = request.get_json()
-    if not data or 'text' not in data:
-        return jsonify({'error': 'Send JSON with "text" field.'}), 400
 
-    bullet_text = data.get('text', '').strip()
-    context = data.get('context', '')
+    try:
 
-    if len(bullet_text) < 5:
-        return jsonify({'error': 'Text too short.'}), 400
-    if len(bullet_text) > 500:
-        return jsonify({'error': 'Text too long (max 500 chars).'}), 400
+        data = request.get_json()
 
-    if not os.environ.get("GROQ_API_KEY"):
-        return jsonify({'error': 'AI not configured on server.'}), 503
+        if not data or 'text' not in data:
 
-    result = rewrite_bullet_point(bullet_text, context)
-    return jsonify(result)
+            return jsonify({
+                'success': False,
+                'error': 'Missing text field.'
+            }), 400
+
+        bullet_text = data.get('text', '').strip()
+        context = data.get('context', '')
+
+        if len(bullet_text) < 5:
+
+            return jsonify({
+                'success': False,
+                'error': 'Text too short.'
+            }), 400
+
+        if not os.environ.get("GROQ_API_KEY"):
+
+            return jsonify({
+                'success': False,
+                'error': 'GROQ_API_KEY missing.'
+            }), 503
+
+        print("✅ Rewrite endpoint hit")
+
+        result = rewrite_bullet_point(
+            bullet_text,
+            context
+        )
+
+        print("✅ Rewrite success")
+
+        return jsonify({
+            'success': True,
+            'result': result
+        })
+
+    except Exception as e:
+
+        print("❌ REWRITE ERROR:", str(e))
+
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 # ============================================================
 # ENTRY POINT
 # ============================================================
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5000, host='0.0.0.0')
+    app.run(
+        debug=True,
+        host='0.0.0.0',
+        port=5000
+    )
